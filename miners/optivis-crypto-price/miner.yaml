@@ -155,4 +155,7 @@ on_chain:
     - endpoint: pair
       method: GET
       query_params:
-        ref: { source: strings.0, type: string, optional: true }
+        ref:
+          source: strings.0
+          type: string
+          optional: true

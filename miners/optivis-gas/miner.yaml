@@ -88,4 +88,7 @@ on_chain:
     - endpoint: gas
       method: POST
       query_params:
-        ref: { source: strings.0, type: string, optional: true }
+        ref:
+          source: strings.0
+          type: string
+          optional: true

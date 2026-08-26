@@ -101,10 +101,14 @@ output_schema:
       type: object
       description: Highest-TVL yield pool when /yields is used.
       properties:
-        project: { type: string }
-        chain: { type: string }
-        tvl_usd: { type: number }
-        apy: { type: number }
+        project:
+          type: string
+        chain:
+          type: string
+        tvl_usd:
+          type: number
+        apy:
+          type: number
 
 semantics:
   signal_mapping:
@@ -149,4 +153,7 @@ on_chain:
     - endpoint: protocol
       method: GET
       query_params:
-        ref: { source: strings.0, type: string, optional: true }
+        ref:
+          source: strings.0
+          type: string
+          optional: true
