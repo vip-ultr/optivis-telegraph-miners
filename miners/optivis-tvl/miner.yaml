@@ -20,15 +20,15 @@ circuit_threshold: 5
 circuit_cooldown_seconds: 30
 endpoints:
   - path: /protocol
-    external_path: /protocol
+    external_path: /protocol/uniswap
     method: GET
     content_type: application/json
-    description: "Current TVL of a named DeFi protocol, with per-chain breakdown."
+    description: "Current TVL of a named DeFi protocol, with per-chain breakdown. Defaults to uniswap."
     intents:
       - TVL_LOOKUP
     params:
       query:
-        required:
+        optional:
           - name: protocol
             type: string
             intents:
