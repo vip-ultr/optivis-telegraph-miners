@@ -8,10 +8,27 @@ re-deriving context. Last updated: **2026-08-26**.
 | Miner | Slug | Intent | YAML | VERIFY | Uploaded | Registered |
 |---|---|---|---|---|---|---|
 | Optivis Crypto Price | `optivis-crypto-price` | CRYPTO_PRICE | done | 6/6 | sandbox 200/200 (baked defaults) | REGISTERED (id 7311, tx 0x659347838cb76a2e8e43c55e551ffe11f73f110da4e02791d8b430bd0bdc3141) |
-| Optivis TVL Oracle | `optivis-tvl` | TVL_LOOKUP | done | 6/6 | sandbox 200 (baked uniswap) | BLOCKED: pin bug |
-| Optivis Gas Oracle | `optivis-gas` | GAS_PRICE | done | 6/6 | sandbox 405 (JSON-RPC body) | BLOCKED: pin bug |
+| Optivis TVL Oracle | `optivis-tvl` | TVL_LOOKUP | done | 6/6 | sandbox 200 (baked uniswap) | REGISTERED (id 7312, tx 0xd8e37bbe3a17047bc051b63b954db5f0ce5899920f73be9d0f05d61dd1e90c6c) |
+| Optivis Gas Oracle | `optivis-gas` | GAS_PRICE | done | 6/6 | sandbox 405 (JSON-RPC body) | DEFERRED: need body-capable API |
 
-Phase: **Track 1 miners drafted & verified. BLOCKED on wizard IPFS pin bug.**
+Phase: **2 of 3 miners registered & live. Gas deferred pending a keyless API
+that works without a static JSON-RPC POST body (wizard 405s; no YAML field to
+declare a fixed body, and no keyless GET gas source exists).**
+
+## Competitor note (2026-08-26)
+TVL_LOOKUP already has a live competitor: `tvlwire-oracle` (id 301). CRYPTO_PRICE
+and GAS_PRICE appear empty/unserved. So our strongest rank-#1 shot is CRYPTO_PRICE.
+TVL will compete but our multi-source + Solana-first angle differentiates.
+
+## Gas decision (deferred)
+The wizard sandbox POSTs /gas with no JSON-RPC body -> meowrpc returns 405. No
+keyless GET gas API exists (publicnode GET returned HTML landing page, not RPC).
+No YAML `body:` field accepts a static literal (body only maps from on-chain
+arrays). Options to revisit:
+- Ask team if Engine auto-sends eth_gasPrice body for GAS_PRICE, or if a static
+  body field exists.
+- Find a keyless gas REST endpoint (none known without API key).
+- Reconsider gas entirely; CRYPTO_PRICE + TVL_LOOKUP are the solid submissions.
 
 ## KNOWN BLOCKER (2026-08-26) — report to team
 
