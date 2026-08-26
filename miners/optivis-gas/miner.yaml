@@ -24,7 +24,7 @@ circuit_cooldown_seconds: 30
 
 endpoints:
   - path: /gas
-    external_path: ""
+    external_path: /
     method: POST
     content_type: application/json
     description: "Current Ethereum gas price in gwei via eth_gasPrice (JSON-RPC)."

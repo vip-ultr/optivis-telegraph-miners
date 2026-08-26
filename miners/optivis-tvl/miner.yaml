@@ -13,6 +13,7 @@ docs:
   twitter: "https://x.com/vip_ultr"
 auth:
   type: none
+
 rate_limit_per_sec: 6
 cache_ttl_sec: 300
 circuit_threshold: 5
