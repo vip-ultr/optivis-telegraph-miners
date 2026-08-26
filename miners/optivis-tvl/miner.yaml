@@ -117,19 +117,24 @@ on_chain:
       - index: 0
         name: source
         source_path: source
+        description: "Upstream that produced the answer (defillama)."
       - index: 1
         name: protocol
         source_path: protocol
+        description: "Protocol slug when a named protocol was queried."
     integers:
       - index: 0
         name: tvl_usd_x100
         source_path: tvl_usd
         multiplier: 100
+        description: "Current TVL in USD scaled by 100."
       - index: 1
         name: top_pool_tvl_x100
         source_path: top_pool.tvl_usd
         multiplier: 100
+        description: "Highest-TVL yield pool TVL in USD scaled by 100."
       - index: 2
         name: top_pool_apy_x10000
         source_path: top_pool.apy
         multiplier: 10000
+        description: "Top pool APY scaled by 10000."

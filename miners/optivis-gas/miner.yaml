@@ -72,8 +72,10 @@ on_chain:
       - index: 0
         name: source
         source_path: source
+        description: "Upstream RPC that produced the gas price."
     integers:
       - index: 0
         name: gas_gwei_x100
         source_path: gas_gwei
         multiplier: 100
+        description: "Current gas price in gwei scaled by 100."

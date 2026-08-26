@@ -119,23 +119,29 @@ on_chain:
       - index: 0
         name: source
         source_path: source
+        description: "Upstream that produced the answer (coingecko or dexscreener)."
       - index: 1
         name: base_symbol
         source_path: pair.base_symbol
+        description: "Base token symbol of the best DEX pair."
     integers:
       - index: 0
         name: price_usd_x100000
         source_path: price_usd
         multiplier: 100000
+        description: "Spot USD price scaled by 100000."
       - index: 1
         name: liquidity_usd_x100
         source_path: pair.liquidity_usd
         multiplier: 100
+        description: "DEX pair liquidity in USD scaled by 100."
       - index: 2
         name: volume_24h_x100
         source_path: pair.volume_24h
         multiplier: 100
+        description: "24h pair volume in USD scaled by 100."
       - index: 3
         name: fdv_x100
         source_path: pair.fdv
         multiplier: 100
+        description: "Pair fully-diluted valuation in USD scaled by 100."
