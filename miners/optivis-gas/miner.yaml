@@ -80,3 +80,11 @@ on_chain:
         source_path: gas_gwei
         multiplier: 100
         description: "Current gas price in gwei scaled by 100."
+
+  # Reverse direction: re-inject a stored on-chain value into an API call.
+  # Benign for our stateless miners - the upstream ignores the extra param.
+  request:
+    - endpoint: gas
+      method: POST
+      query_params:
+        ref: { source: strings.0, type: string, optional: true }

@@ -139,3 +139,11 @@ on_chain:
         source_path: top_pool.apy
         multiplier: 10000
         description: "Top pool APY scaled by 10000."
+
+  # Reverse direction: re-inject a stored on-chain value into an API call.
+  # Benign for our stateless miners - the upstream ignores the extra param.
+  request:
+    - endpoint: protocol
+      method: GET
+      query_params:
+        ref: { source: strings.0, type: string, optional: true }
