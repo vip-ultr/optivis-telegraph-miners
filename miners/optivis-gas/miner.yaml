@@ -65,6 +65,7 @@ semantics:
     - GAS_PRICE
 
 on_chain:
+  description: "Stores the current gas price in gwei plus a source tag so downstream agents and contracts can consume verified network congestion signal directly on-chain."
   transform: direct
   min_price_usdc: 0.01
   fields:

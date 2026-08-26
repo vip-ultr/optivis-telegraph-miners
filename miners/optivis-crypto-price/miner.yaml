@@ -112,6 +112,7 @@ semantics:
     - CRYPTO_PRICE
 
 on_chain:
+  description: "Stores the primary numeric answer (price, TVL, or gas in gwei) plus a source tag and, for pairs, liquidity/volume/FDV so downstream agents and contracts can consume verified market signal directly on-chain."
   transform: direct
   min_price_usdc: 0.01
   fields:

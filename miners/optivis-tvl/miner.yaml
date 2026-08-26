@@ -110,6 +110,7 @@ semantics:
     - TVL_LOOKUP
 
 on_chain:
+  description: "Stores the primary TVL figure plus a source tag and, for yield queries, the top pool TVL and APY so downstream agents and contracts can consume verified DeFi scale signal directly on-chain."
   transform: direct
   min_price_usdc: 0.01
   fields:
