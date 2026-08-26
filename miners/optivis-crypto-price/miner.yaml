@@ -149,13 +149,10 @@ on_chain:
         multiplier: 100
         description: "Pair fully-diluted valuation in USD scaled by 100."
 
-  # Reverse direction: re-inject a stored on-chain value into an API call.
-  # Benign for our stateless miners - the upstream ignores the extra param.
   request:
     - endpoint: pair
       method: GET
       query_params:
         ref:
           source: strings.0
-          type: string
           optional: true

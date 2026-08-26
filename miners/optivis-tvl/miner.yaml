@@ -4,14 +4,7 @@ id: 7312
 slug: optivis-tvl
 protocol: generic
 name: Optivis TVL Oracle
-description: >-
-  Verifiable Total Value Locked for autonomous DeFi agents. Wraps DefiLlama's
-  fully keyless APIs: protocol-level TVL (current + per-chain breakdown),
-  chain-level TVL, and top yield pools with APY. Solana is a first-class
-  citizen, query any chain by name and read its TVL directly. A single miner
-  an agent can call to assess protocol scale, chain dominance, or farming
-  yield before acting.
-
+description: "Verifiable Total Value Locked for autonomous DeFi agents. Wraps DefiLlama keyless APIs: protocol TVL with per-chain breakdown, chain TVL, and top yield pools with APY. Solana is a first-class citizen."
 base_url: https://api.llama.fi
 
 docs:
@@ -34,72 +27,78 @@ endpoints:
     method: GET
     content_type: application/json
     description: "Current TVL of a named DeFi protocol, with per-chain breakdown."
-    intents: [TVL_LOOKUP]
+    intents:
+      - TVL_LOOKUP
     params:
       query:
         required:
           - name: protocol
             type: string
-            intents: ["*"]
-            description: DefiLlama protocol slug, e.g. uniswap, jupiter, lido.
+            intents:
+              - "*"
+            description: "DefiLlama protocol slug, e.g. uniswap, jupiter, lido."
             example: uniswap
-
   - path: /chain
     external_path: /v2/chains
     method: GET
     content_type: application/json
     description: "TVL of an entire chain by name (returns the full chain list)."
-    intents: [TVL_LOOKUP]
+    intents:
+      - TVL_LOOKUP
     params:
       query:
         required:
           - name: chain
             type: string
-            intents: ["*"]
-            description: Chain name to read, e.g. Solana, Ethereum, Base.
+            intents:
+              - "*"
+            description: "Chain name to read, e.g. Solana, Ethereum, Base."
             example: Solana
-
   - path: /yields
     external_path: /pools
     endpoint_base_url: https://yields.llama.fi
     method: GET
     content_type: application/json
     description: "Top yield pools by TVL, optionally filtered by chain."
-    intents: [TVL_LOOKUP]
+    intents:
+      - TVL_LOOKUP
     params:
       query:
         optional:
           - name: chain
             type: string
-            intents: ["*"]
-            description: Restrict pools to a chain, e.g. Base, Solana.
+            intents:
+              - "*"
+            description: "Restrict pools to a chain, e.g. Base, Solana."
 
 input_schema:
   type: object
   properties:
     protocol:
       type: string
-      description: DefiLlama protocol slug for /protocol.
+      description: "DefiLlama protocol slug for /protocol."
     chain:
       type: string
-      description: Chain name for /chain or /yields filter.
+      description: "Chain name for /chain or /yields filter."
 
 output_schema:
   type: object
   properties:
     tvl_usd:
       type: number
-      description: Primary answer - current TVL (protocol or chain) in USD.
+      description: "Primary answer - current TVL (protocol or chain) in USD."
     source:
       type: string
+      description: "Which upstream produced the answer."
     protocol:
       type: string
+      description: "Protocol slug when a named protocol was queried."
     chain_tvls:
       type: object
-      description: Per-chain TVL breakdown (protocol endpoint).
+      description: "Per-chain TVL breakdown (protocol endpoint)."
     top_pool:
       type: object
-      description: Highest-TVL yield pool when /yields is used.
+      description: "Highest-TVL yield pool when /yields is used."
       properties:
         project:
           type: string
@@ -147,13 +146,10 @@ on_chain:
         multiplier: 10000
         description: "Top pool APY scaled by 10000."
 
-  # Reverse direction: re-inject a stored on-chain value into an API call.
-  # Benign for our stateless miners - the upstream ignores the extra param.
   request:
     - endpoint: protocol
       method: GET
       query_params:
         ref:
           source: strings.0
-          type: string
           optional: true

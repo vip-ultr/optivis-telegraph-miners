@@ -4,13 +4,7 @@ id: 7313
 slug: optivis-gas
 protocol: generic
 name: Optivis Gas Oracle
-description: >-
-  Verifiable network gas price for autonomous transaction-optimisation agents.
-  Wraps a keyless Ethereum JSON-RPC (eth_gasPrice) and reports the current gas
-  price in gwei. No API key, no account - the node calls a public RPC directly.
-  Useful for agents deciding when to send transactions, estimate fees, or
-  monitor network congestion before acting on-chain.
-
+description: "Verifiable network gas price for autonomous transaction-optimisation agents. Wraps a keyless Ethereum JSON-RPC (eth_gasPrice) and reports the current gas price in gwei. No API key, no account - the node calls a public RPC directly."
 base_url: https://eth.meowrpc.com
 
 docs:
@@ -33,14 +27,16 @@ endpoints:
     method: POST
     content_type: application/json
     description: "Current Ethereum gas price in gwei via eth_gasPrice (JSON-RPC)."
-    intents: [GAS_PRICE]
+    intents:
+      - GAS_PRICE
     params:
       query:
         optional:
           - name: chain
             type: string
-            intents: ["*"]
-            description: Chain name (reserved; defaults to ethereum).
+            intents:
+              - "*"
+            description: "Chain name (reserved for future multi-chain support)."
             default: ethereum
 
 input_schema:
@@ -48,16 +44,17 @@ input_schema:
   properties:
     chain:
       type: string
-      description: Chain name (reserved for future multi-chain support).
+      description: "Chain name (reserved for future multi-chain support)."
 
 output_schema:
   type: object
   properties:
     gas_gwei:
       type: number
-      description: Current gas price in gwei.
+      description: "Current gas price in gwei."
     source:
       type: string
+      description: "Which upstream produced the answer."
 
 semantics:
   signal_mapping:
@@ -82,13 +79,10 @@ on_chain:
         multiplier: 100
         description: "Current gas price in gwei scaled by 100."
 
-  # Reverse direction: re-inject a stored on-chain value into an API call.
-  # Benign for our stateless miners - the upstream ignores the extra param.
   request:
     - endpoint: gas
       method: POST
       query_params:
         ref:
           source: strings.0
-          type: string
           optional: true
