@@ -4,16 +4,7 @@ id: 7311
 slug: optivis-crypto-price
 protocol: generic
 name: Optivis Crypto Price
-description: >-
-  Verifiable spot crypto pricing for autonomous agents. Wraps CoinGecko's
-  keyless simple-price API for instant symbol lookups (SOL, ETH, BTC, and
-  any coingecko symbol) and DexScreener for on-chain pair depth (best DEX
-  pair, USD price, liquidity, 24h volume, FDV, pair age). Solana-first
-  examples: pair lookups default to Solana-native tokens so agents building
-  on the Solana ecosystem get deep, tradable signal, not just a number.
-  Multi-source answers (price + liquidity + volume) make this the single
-  miner an agent needs to evaluate a token.
-
+description: "Verifiable spot crypto pricing for autonomous agents. Wraps CoinGecko keyless simple-price API for symbol lookups and DexScreener for on-chain pair depth. Solana-first pair lookups. Multi-source answers: price plus liquidity, volume and FDV."
 base_url: https://api.coingecko.com
 
 docs:
@@ -34,44 +25,43 @@ endpoints:
   - path: /price
     external_path: /api/v3/simple/price
     method: GET
-    description: >-
-      Spot USD price for one or more symbols (e.g. sol, eth, btc). CoinGecko
-      is keyless and returns a flat {symbol: {usd: number}} map.
-    intents: [CRYPTO_PRICE]
+    description: "Spot USD price for one or more symbols via CoinGecko keyless API."
+    intents:
+      - CRYPTO_PRICE
     params:
       query:
         required:
           - name: symbols
             type: string
-            intents: ["*"]
-            description: Comma-separated CoinGecko symbols, e.g. sol,eth,bonk.
+            intents:
+              - "*"
+            description: "Comma-separated CoinGecko symbols, e.g. sol,eth,bonk."
             example: sol,eth
         optional:
           - name: vs_currencies
             type: string
-            intents: ["*"]
-            description: Comma-separated quote currencies. Defaults to usd.
+            intents:
+              - "*"
+            description: "Comma-separated quote currencies. Defaults to usd."
             default: usd
     param_map:
       symbols: symbols
       vs_currencies: vs_currencies
-
   - path: /pair
     external_path: /latest/dex/tokens
     endpoint_base_url: https://api.dexscreener.com
     method: GET
-    description: >-
-      Best on-chain DEX pair for a token address. Returns USD price, liquidity,
-      24h volume, FDV and pair age. Solana token addresses give Solana-native
-      pair data by default.
-    intents: [CRYPTO_PRICE]
+    description: "Best on-chain DEX pair for a token address. Returns USD price, liquidity, volume, FDV and pair age."
+    intents:
+      - CRYPTO_PRICE
     params:
       query:
         required:
           - name: token
             type: string
-            intents: ["*"]
-            description: Token contract address (e.g. So111...1112 for Wrapped SOL).
+            intents:
+              - "*"
+            description: "Token contract address, e.g. So11111111111111111111111111111111111111112 for Wrapped SOL."
             example: So11111111111111111111111111111111111111112
 
 input_schema:
@@ -79,34 +69,41 @@ input_schema:
   properties:
     symbols:
       type: string
-      description: Comma-separated CoinGecko symbols for /price.
+      description: "Comma-separated CoinGecko symbols for /price."
     token:
       type: string
-      description: Token contract address for /pair.
+      description: "Token contract address for /pair."
     vs_currencies:
       type: string
-      description: Quote currencies (default usd).
+      description: "Quote currencies, default usd."
 
 output_schema:
   type: object
   properties:
     price_usd:
       type: number
-      description: Spot USD price (from /price, first requested symbol).
+      description: "Spot USD price from /price, first requested symbol."
     source:
       type: string
-      description: Which upstream produced the answer.
+      description: "Which upstream produced the answer."
     pair:
       type: object
-      description: Best DEX pair snapshot (from /pair) when token supplied.
+      description: "Best DEX pair snapshot from /pair when token supplied."
       properties:
-        chain: { type: string }
-        price_usd: { type: number }
-        liquidity_usd: { type: number }
-        volume_24h: { type: number }
-        fdv: { type: number }
-        pair_age_hours: { type: number }
-        base_symbol: { type: string }
+        chain:
+          type: string
+        price_usd:
+          type: number
+        liquidity_usd:
+          type: number
+        volume_24h:
+          type: number
+        fdv:
+          type: number
+        pair_age_hours:
+          type: number
+        base_symbol:
+          type: string
 
 semantics:
   signal_mapping:
