@@ -32,7 +32,8 @@ endpoints:
   - path: /protocol
     external_path: /protocol
     method: GET
-    description: Current TVL of a named DeFi protocol, with per-chain breakdown.
+    content_type: application/json
+    description: "Current TVL of a named DeFi protocol, with per-chain breakdown."
     intents: [TVL_LOOKUP]
     params:
       query:
@@ -46,7 +47,8 @@ endpoints:
   - path: /chain
     external_path: /v2/chains
     method: GET
-    description: TVL of an entire chain by name (returns the full chain list).
+    content_type: application/json
+    description: "TVL of an entire chain by name (returns the full chain list)."
     intents: [TVL_LOOKUP]
     params:
       query:
@@ -61,7 +63,8 @@ endpoints:
     external_path: /pools
     endpoint_base_url: https://yields.llama.fi
     method: GET
-    description: Top yield pools by TVL, optionally filtered by chain.
+    content_type: application/json
+    description: "Top yield pools by TVL, optionally filtered by chain."
     intents: [TVL_LOOKUP]
     params:
       query:

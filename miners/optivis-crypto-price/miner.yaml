@@ -25,6 +25,7 @@ endpoints:
   - path: /price
     external_path: /api/v3/simple/price
     method: GET
+    content_type: application/json
     description: "Spot USD price for one or more symbols via CoinGecko keyless API."
     intents:
       - CRYPTO_PRICE
@@ -51,6 +52,7 @@ endpoints:
     external_path: /latest/dex/tokens
     endpoint_base_url: https://api.dexscreener.com
     method: GET
+    content_type: application/json
     description: "Best on-chain DEX pair for a token address. Returns USD price, liquidity, volume, FDV and pair age."
     intents:
       - CRYPTO_PRICE
