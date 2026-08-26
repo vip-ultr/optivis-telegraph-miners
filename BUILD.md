@@ -7,7 +7,7 @@ re-deriving context. Last updated: **2026-08-26**.
 
 | Miner | Slug | Intent | YAML | VERIFY | Uploaded | Registered |
 |---|---|---|---|---|---|---|
-| Optivis Crypto Price | `optivis-crypto-price` | CRYPTO_PRICE | done | 6/6 | sandbox 200/200 (baked defaults) | BLOCKED: pin bug |
+| Optivis Crypto Price | `optivis-crypto-price` | CRYPTO_PRICE | done | 6/6 | sandbox 200/200 (baked defaults) | REGISTERED (id 7311, tx 0x6593...3141) |
 | Optivis TVL Oracle | `optivis-tvl` | TVL_LOOKUP | done | 6/6 | sandbox 200 (baked uniswap) | BLOCKED: pin bug |
 | Optivis Gas Oracle | `optivis-gas` | GAS_PRICE | done | 6/6 | sandbox 405 (JSON-RPC body) | BLOCKED: pin bug |
 
