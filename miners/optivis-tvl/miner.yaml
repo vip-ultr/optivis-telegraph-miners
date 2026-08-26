@@ -6,21 +6,17 @@ protocol: generic
 name: Optivis TVL Oracle
 description: "Verifiable Total Value Locked for autonomous DeFi agents. Wraps DefiLlama keyless APIs: protocol TVL with per-chain breakdown, chain TVL, and top yield pools with APY. Solana is a first-class citizen."
 base_url: https://api.llama.fi
-
 docs:
   website: https://github.com/vip-ultr/optivis-telegraph-miners
   documentation: https://github.com/vip-ultr/optivis-telegraph-miners
   repository: https://github.com/vip-ultr/optivis-telegraph-miners
-  twitter: "@vip_ultr"
-
+  twitter: "https://x.com/vip_ultr"
 auth:
   type: none
-
 rate_limit_per_sec: 6
 cache_ttl_sec: 300
 circuit_threshold: 5
 circuit_cooldown_seconds: 30
-
 endpoints:
   - path: /protocol
     external_path: /protocol

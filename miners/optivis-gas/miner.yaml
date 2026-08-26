@@ -1,3 +1,4 @@
+
 version: "1"
 kind: miner
 id: 7313
@@ -11,7 +12,7 @@ docs:
   website: https://github.com/vip-ultr/optivis-telegraph-miners
   documentation: https://github.com/vip-ultr/optivis-telegraph-miners
   repository: https://github.com/vip-ultr/optivis-telegraph-miners
-  twitter: "@vip_ultr"
+  twitter: "https://x.com/vip_ultr"
 
 auth:
   type: none
