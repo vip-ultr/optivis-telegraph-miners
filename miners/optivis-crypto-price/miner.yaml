@@ -17,7 +17,7 @@ description: >-
 base_url: https://api.coingecko.com
 
 docs:
-  website: https://optivislabs.vercel.app
+  website: https://github.com/vip-ultr/optivis-telegraph-miners
   documentation: https://github.com/vip-ultr/optivis-telegraph-miners
   repository: https://github.com/vip-ultr/optivis-telegraph-miners
   twitter: "@vip_ultr"

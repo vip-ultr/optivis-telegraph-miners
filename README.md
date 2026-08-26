@@ -2,7 +2,7 @@
 
 A suite of **verifiable financial-data miners** for the [Telegraph Protocol](https://telegraphprotocol.com)
 autonomous-inference network, built for the **Telegraph Hackathon (Season I, H1)**
-by [Optivis Labs](https://optivislabs.vercel.app).
+by [@vip_ultr](https://x.com/vip_ultr) for the Telegraph Hackathon (Season I, H1).
 
 Three miners, one branded suite, all wrapped from **free, keyless, public APIs**
 and proven field-by-field against live data:
@@ -79,4 +79,4 @@ and current status of each miner.
   CRYPTO_PRICE is the planned phase-2 extension (see BUILD.md).
 
 ---
-Built by Optivis Labs · X: [@vip_ultr](https://x.com/vip_ultr)
+Built by @vip_ultr · X: [@vip_ultr](https://x.com/vip_ultr)

@@ -10,7 +10,8 @@ story, one README = stronger submission than 3 scattered repos.
 
 **D2. Branding: `optivis-*` slugs (`optivis-crypto-price`, `optivis-tvl`,
 `optivis-gas`).**
-Rationale: recognizable suite on leaderboard; builds Optivis Labs identity;
+Rationale: recognizable suite on leaderboard; consistent personal identity
+  across the three miners so agents and judges recognize one coherent entry.
 helps "apps built on your miner" + branding judging.
 
 **D3. Track 1 (Miner) for H1; Track 2 (Script) is phase 2.**
