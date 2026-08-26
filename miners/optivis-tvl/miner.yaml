@@ -1,0 +1,135 @@
+version: "1"
+kind: miner
+id: 7312
+slug: optivis-tvl
+protocol: generic
+name: Optivis TVL Oracle
+description: >-
+  Verifiable Total Value Locked for autonomous DeFi agents. Wraps DefiLlama's
+  fully keyless APIs: protocol-level TVL (current + per-chain breakdown),
+  chain-level TVL, and top yield pools with APY. Solana is a first-class
+  citizen, query any chain by name and read its TVL directly. A single miner
+  an agent can call to assess protocol scale, chain dominance, or farming
+  yield before acting.
+
+base_url: https://api.llama.fi
+
+docs:
+  website: https://optivislabs.vercel.app
+  documentation: https://github.com/vip-ultr/optivis-telegraph-miners
+  repository: https://github.com/vip-ultr/optivis-telegraph-miners
+  twitter: "@vip_ultr"
+
+auth:
+  type: none
+
+rate_limit_per_sec: 6
+cache_ttl_sec: 300
+circuit_threshold: 5
+circuit_cooldown_seconds: 30
+
+endpoints:
+  - path: /protocol
+    external_path: /protocol
+    method: GET
+    description: Current TVL of a named DeFi protocol, with per-chain breakdown.
+    intents: [TVL_LOOKUP]
+    params:
+      query:
+        required:
+          - name: protocol
+            type: string
+            intents: ["*"]
+            description: DefiLlama protocol slug, e.g. uniswap, jupiter, lido.
+            example: uniswap
+
+  - path: /chain
+    external_path: /v2/chains
+    method: GET
+    description: TVL of an entire chain by name (returns the full chain list).
+    intents: [TVL_LOOKUP]
+    params:
+      query:
+        required:
+          - name: chain
+            type: string
+            intents: ["*"]
+            description: Chain name to read, e.g. Solana, Ethereum, Base.
+            example: Solana
+
+  - path: /yields
+    external_path: /pools
+    endpoint_base_url: https://yields.llama.fi
+    method: GET
+    description: Top yield pools by TVL, optionally filtered by chain.
+    intents: [TVL_LOOKUP]
+    params:
+      query:
+        optional:
+          - name: chain
+            type: string
+            intents: ["*"]
+            description: Restrict pools to a chain, e.g. Base, Solana.
+
+input_schema:
+  type: object
+  properties:
+    protocol:
+      type: string
+      description: DefiLlama protocol slug for /protocol.
+    chain:
+      type: string
+      description: Chain name for /chain or /yields filter.
+
+output_schema:
+  type: object
+  properties:
+    tvl_usd:
+      type: number
+      description: Primary answer - current TVL (protocol or chain) in USD.
+    source:
+      type: string
+    protocol:
+      type: string
+    chain_tvls:
+      type: object
+      description: Per-chain TVL breakdown (protocol endpoint).
+    top_pool:
+      type: object
+      description: Highest-TVL yield pool when /yields is used.
+      properties:
+        project: { type: string }
+        chain: { type: string }
+        tvl_usd: { type: number }
+        apy: { type: number }
+
+semantics:
+  signal_mapping:
+    label_field: tvl_usd
+  supported_intents:
+    - TVL_LOOKUP
+
+on_chain:
+  transform: direct
+  min_price_usdc: 0.01
+  fields:
+    strings:
+      - index: 0
+        name: source
+        source_path: source
+      - index: 1
+        name: protocol
+        source_path: protocol
+    integers:
+      - index: 0
+        name: tvl_usd_x100
+        source_path: tvl_usd
+        multiplier: 100
+      - index: 1
+        name: top_pool_tvl_x100
+        source_path: top_pool.tvl_usd
+        multiplier: 100
+      - index: 2
+        name: top_pool_apy_x10000
+        source_path: top_pool.apy
+        multiplier: 10000

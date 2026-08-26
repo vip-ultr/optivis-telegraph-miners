@@ -1,0 +1,144 @@
+version: "1"
+kind: miner
+id: 7311
+slug: optivis-crypto-price
+protocol: generic
+name: Optivis Crypto Price
+description: >-
+  Verifiable spot crypto pricing for autonomous agents. Wraps CoinGecko's
+  keyless simple-price API for instant symbol lookups (SOL, ETH, BTC, and
+  any coingecko symbol) and DexScreener for on-chain pair depth (best DEX
+  pair, USD price, liquidity, 24h volume, FDV, pair age). Solana-first
+  examples: pair lookups default to Solana-native tokens so agents building
+  on the Solana ecosystem get deep, tradable signal, not just a number.
+  Multi-source answers (price + liquidity + volume) make this the single
+  miner an agent needs to evaluate a token.
+
+base_url: https://api.coingecko.com
+
+docs:
+  website: https://optivislabs.vercel.app
+  documentation: https://github.com/vip-ultr/optivis-telegraph-miners
+  repository: https://github.com/vip-ultr/optivis-telegraph-miners
+  twitter: "@vip_ultr"
+
+auth:
+  type: none
+
+rate_limit_per_sec: 8
+cache_ttl_sec: 30
+circuit_threshold: 5
+circuit_cooldown_seconds: 30
+
+endpoints:
+  - path: /price
+    external_path: /api/v3/simple/price
+    method: GET
+    description: >-
+      Spot USD price for one or more symbols (e.g. sol, eth, btc). CoinGecko
+      is keyless and returns a flat {symbol: {usd: number}} map.
+    intents: [CRYPTO_PRICE]
+    params:
+      query:
+        required:
+          - name: symbols
+            type: string
+            intents: ["*"]
+            description: Comma-separated CoinGecko symbols, e.g. sol,eth,bonk.
+            example: sol,eth
+        optional:
+          - name: vs_currencies
+            type: string
+            intents: ["*"]
+            description: Comma-separated quote currencies. Defaults to usd.
+            default: usd
+    param_map:
+      symbols: symbols
+      vs_currencies: vs_currencies
+
+  - path: /pair
+    external_path: /latest/dex/tokens
+    endpoint_base_url: https://api.dexscreener.com
+    method: GET
+    description: >-
+      Best on-chain DEX pair for a token address. Returns USD price, liquidity,
+      24h volume, FDV and pair age. Solana token addresses give Solana-native
+      pair data by default.
+    intents: [CRYPTO_PRICE]
+    params:
+      query:
+        required:
+          - name: token
+            type: string
+            intents: ["*"]
+            description: Token contract address (e.g. So111...1112 for Wrapped SOL).
+            example: So11111111111111111111111111111111111111112
+
+input_schema:
+  type: object
+  properties:
+    symbols:
+      type: string
+      description: Comma-separated CoinGecko symbols for /price.
+    token:
+      type: string
+      description: Token contract address for /pair.
+    vs_currencies:
+      type: string
+      description: Quote currencies (default usd).
+
+output_schema:
+  type: object
+  properties:
+    price_usd:
+      type: number
+      description: Spot USD price (from /price, first requested symbol).
+    source:
+      type: string
+      description: Which upstream produced the answer.
+    pair:
+      type: object
+      description: Best DEX pair snapshot (from /pair) when token supplied.
+      properties:
+        chain: { type: string }
+        price_usd: { type: number }
+        liquidity_usd: { type: number }
+        volume_24h: { type: number }
+        fdv: { type: number }
+        pair_age_hours: { type: number }
+        base_symbol: { type: string }
+
+semantics:
+  signal_mapping:
+    label_field: price_usd
+  supported_intents:
+    - CRYPTO_PRICE
+
+on_chain:
+  transform: direct
+  min_price_usdc: 0.01
+  fields:
+    strings:
+      - index: 0
+        name: source
+        source_path: source
+      - index: 1
+        name: base_symbol
+        source_path: pair.base_symbol
+    integers:
+      - index: 0
+        name: price_usd_x100000
+        source_path: price_usd
+        multiplier: 100000
+      - index: 1
+        name: liquidity_usd_x100
+        source_path: pair.liquidity_usd
+        multiplier: 100
+      - index: 2
+        name: volume_24h_x100
+        source_path: pair.volume_24h
+        multiplier: 100
+      - index: 3
+        name: fdv_x100
+        source_path: pair.fdv
+        multiplier: 100

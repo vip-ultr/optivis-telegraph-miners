@@ -1,0 +1,79 @@
+version: "1"
+kind: miner
+id: 7313
+slug: optivis-gas
+protocol: generic
+name: Optivis Gas Oracle
+description: >-
+  Verifiable network gas price for autonomous transaction-optimisation agents.
+  Wraps a keyless Ethereum JSON-RPC (eth_gasPrice) and reports the current gas
+  price in gwei. No API key, no account - the node calls a public RPC directly.
+  Useful for agents deciding when to send transactions, estimate fees, or
+  monitor network congestion before acting on-chain.
+
+base_url: https://eth.meowrpc.com
+
+docs:
+  website: https://optivislabs.vercel.app
+  documentation: https://github.com/vip-ultr/optivis-telegraph-miners
+  repository: https://github.com/vip-ultr/optivis-telegraph-miners
+  twitter: "@vip_ultr"
+
+auth:
+  type: none
+
+rate_limit_per_sec: 10
+cache_ttl_sec: 15
+circuit_threshold: 5
+circuit_cooldown_seconds: 30
+
+endpoints:
+  - path: /gas
+    external_path: ""
+    method: POST
+    description: Current Ethereum gas price in gwei via eth_gasPrice (JSON-RPC).
+    intents: [GAS_PRICE]
+    params:
+      query:
+        optional:
+          - name: chain
+            type: string
+            intents: ["*"]
+            description: Chain name (reserved; defaults to ethereum).
+            default: ethereum
+
+input_schema:
+  type: object
+  properties:
+    chain:
+      type: string
+      description: Chain name (reserved for future multi-chain support).
+
+output_schema:
+  type: object
+  properties:
+    gas_gwei:
+      type: number
+      description: Current gas price in gwei.
+    source:
+      type: string
+
+semantics:
+  signal_mapping:
+    label_field: gas_gwei
+  supported_intents:
+    - GAS_PRICE
+
+on_chain:
+  transform: direct
+  min_price_usdc: 0.01
+  fields:
+    strings:
+      - index: 0
+        name: source
+        source_path: source
+    integers:
+      - index: 0
+        name: gas_gwei_x100
+        source_path: gas_gwei
+        multiplier: 100
