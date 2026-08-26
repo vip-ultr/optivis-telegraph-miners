@@ -5,13 +5,34 @@ re-deriving context. Last updated: **2026-08-26**.
 
 ## Status
 
-| Miner | Slug | Intent | YAML | VERIFY | Registered |
-|---|---|---|---|---|---|
-| Optivis Crypto Price | `optivis-crypto-price` | CRYPTO_PRICE | done | 6/6 | PENDING (wizard) |
-| Optivis TVL Oracle | `optivis-tvl` | TVL_LOOKUP | done | 6/6 | PENDING (wizard) |
-| Optivis Gas Oracle | `optivis-gas` | GAS_PRICE | done | 6/6 | PENDING (wizard) |
+| Miner | Slug | Intent | YAML | VERIFY | Uploaded | Registered |
+|---|---|---|---|---|---|---|
+| Optivis Crypto Price | `optivis-crypto-price` | CRYPTO_PRICE | done | 6/6 | sandbox 200/200 (baked defaults) | BLOCKED: pin bug |
+| Optivis TVL Oracle | `optivis-tvl` | TVL_LOOKUP | done | 6/6 | sandbox 200 (baked uniswap) | BLOCKED: pin bug |
+| Optivis Gas Oracle | `optivis-gas` | GAS_PRICE | done | 6/6 | sandbox 405 (JSON-RPC body) | BLOCKED: pin bug |
 
-Phase: **Track 1 miners drafted & verified. Next step = register via wizard.**
+Phase: **Track 1 miners drafted & verified. BLOCKED on wizard IPFS pin bug.**
+
+## KNOWN BLOCKER (2026-08-26) — report to team
+
+The integrate.telegraphprotocol.com wizard "Upload to IPFS" step shows
+"Upload Successful" with CID `QmDcJHrrHSgvFpsYxqb6g97uaQTd2kE31rPUeDZTeDsjVq`
+for ALL three miners. That CID is **invalid** (not a real IPFS hash; Pinata
+returns "CID is invalid", dweb/cloudflare gateways 500/000). So the YAML is
+never actually pinned, and Register On-Chain cannot proceed (no real YAML URL).
+All three showing the identical hash is impossible if content differs ->
+placeholder/bug in the wizard, not our YAML. Need team fix or a working pin path.
+
+Gas note: sandbox returns 405 on /gas because JSON-RPC needs a POST body the
+naive sandbox probe does not send. At runtime the Engine sends the body, so gas
+should work in production; sandbox 405 is expected for JSON-RPC miners.
+
+## Sandbox-test fixes already applied (so endpoints pass once pin works)
+
+- crypto-price: baked `?symbols=sol,eth&vs_currencies=usd` into /price and
+  Wrapped SOL token into /pair external_path (bare probe now 200/200).
+- tvl: baked `/protocol/uniswap` default (bare probe now 200).
+- gas: kept POST JSON-RPC; sandbox 405 is benign (body sent at runtime).
 
 ## Locked decisions
 
