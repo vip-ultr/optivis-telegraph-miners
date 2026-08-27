@@ -1,0 +1,29 @@
+{
+  "name": "optivis-telegraph-miners",
+  "version": "1.0.0",
+  "description": "A suite of **verifiable financial-data miners** for the [Telegraph Protocol](https://telegraphprotocol.com) autonomous-inference network, built for the **Telegraph Hackathon (Season I, H1)** by [@vip_ultr](https://x.com/vip_ultr) for the Telegraph Hackathon (Season I, H1).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vip-ultr/optivis-telegraph-miners.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vip-ultr/optivis-telegraph-miners/issues"
+  },
+  "homepage": "https://github.com/vip-ultr/optivis-telegraph-miners#readme",
+  "dependencies": {
+    "@x402/core": "^2.23.0",
+    "@x402/evm": "^2.23.0",
+    "@x402/fetch": "^2.23.0",
+    "viem": "^2.56.0"
+  }
+}
