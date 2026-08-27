@@ -23,18 +23,58 @@ endpoints:
     external_path: /protocol/uniswap
     method: GET
     content_type: application/json
-    description: "Current TVL of a named DeFi protocol, with per-chain breakdown. Defaults to uniswap."
+    description: "Current TVL of Uniswap, with per-chain breakdown."
     intents:
       - TVL_LOOKUP
-    params:
-      query:
-        optional:
-          - name: protocol
-            type: string
-            intents:
-              - "*"
-            description: "DefiLlama protocol slug, e.g. uniswap, jupiter, lido."
-            example: uniswap
+  - path: /protocol/jupiter
+    external_path: /protocol/jupiter
+    method: GET
+    content_type: application/json
+    description: "Current TVL of Jupiter (Solana), with per-chain breakdown."
+    intents:
+      - TVL_LOOKUP
+  - path: /protocol/lido
+    external_path: /protocol/lido
+    method: GET
+    content_type: application/json
+    description: "Current TVL of Lido, with per-chain breakdown."
+    intents:
+      - TVL_LOOKUP
+  - path: /protocol/aave
+    external_path: /protocol/aave
+    method: GET
+    content_type: application/json
+    description: "Current TVL of Aave, with per-chain breakdown."
+    intents:
+      - TVL_LOOKUP
+  - path: /protocol/curve
+    external_path: /protocol/curve
+    method: GET
+    content_type: application/json
+    description: "Current TVL of Curve, with per-chain breakdown."
+    intents:
+      - TVL_LOOKUP
+  - path: /protocol/marinade
+    external_path: /protocol/marinade
+    method: GET
+    content_type: application/json
+    description: "Current TVL of Marinade (Solana liquid staking), with per-chain breakdown."
+    intents:
+      - TVL_LOOKUP
+  - path: /protocol/jito
+    external_path: /protocol/jito
+    method: GET
+    content_type: application/json
+    description: "Current TVL of Jito (Solana), with per-chain breakdown."
+    intents:
+      - TVL_LOOKUP
+  - path: /protocol/kamino
+    external_path: /protocol/kamino
+    method: GET
+    content_type: application/json
+    description: "Current TVL of Kamino (Solana), with per-chain breakdown."
+    intents:
+      - TVL_LOOKUP
   - path: /chain
     external_path: /v2/chains
     method: GET
@@ -51,6 +91,8 @@ endpoints:
               - "*"
             description: "Chain name to read, e.g. Solana, Ethereum, Base."
             example: Solana
+    param_map:
+      chain: chain
   - path: /yields
     external_path: /pools
     endpoint_base_url: https://yields.llama.fi
@@ -67,13 +109,12 @@ endpoints:
             intents:
               - "*"
             description: "Restrict pools to a chain, e.g. Base, Solana."
+    param_map:
+      chain: chain
 
 input_schema:
   type: object
   properties:
-    protocol:
-      type: string
-      description: "DefiLlama protocol slug for /protocol."
     chain:
       type: string
       description: "Chain name for /chain or /yields filter."

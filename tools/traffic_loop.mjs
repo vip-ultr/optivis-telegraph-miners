@@ -32,11 +32,13 @@ const QUERIES = [
   [7311, "/price", { symbols: "usdc,usdt", vs_currencies: "usd" }, "usdc,usdt price"],
   [7311, "/pair", { token: "So11111111111111111111111111111111111111112" }, "SOL pair"],
   [7311, "/pair", { token: "J1toso1uCk3shnUQ4mAYiT4LWQH7z2Z6i2T3bY9p1x" }, "JTO pair"],
-  [7312, "/protocol", { protocol: "uniswap" }, "uniswap tvl"],
-  [7312, "/protocol", { protocol: "jupiter" }, "jupiter tvl"],
-  [7312, "/protocol", { protocol: "lido" }, "lido tvl"],
-  [7312, "/chain", {}, "ethereum chain tvl"],
-  [7312, "/yields", {}, "top yields"],
+  [7312, "/protocol", {}, "uniswap tvl"],
+  [7312, "/protocol/jupiter", {}, "jupiter tvl"],
+  [7312, "/protocol/lido", {}, "lido tvl"],
+  [7312, "/protocol/marinade", {}, "marinade tvl"],
+  [7312, "/protocol/jito", {}, "jito tvl"],
+  [7312, "/chain", { chain: "Solana" }, "solana chain tvl"],
+  [7312, "/yields", { chain: "Solana" }, "solana yields"],
 ];
 
 const key = process.env.BASE_SEPOLIA_PRIVATE_KEY;
