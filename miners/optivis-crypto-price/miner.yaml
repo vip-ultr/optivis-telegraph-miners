@@ -25,10 +25,10 @@ circuit_cooldown_seconds: 30
 
 endpoints:
   - path: /price
-    external_path: /api/v3/simple/price?symbols=sol,eth&vs_currencies=usd
+    external_path: /api/v3/coins/markets?vs_currency=usd&symbols=sol,eth
     method: GET
     content_type: application/json
-    description: "Spot USD price for symbols via CoinGecko keyless API. Defaults to sol,eth (Solana-first)."
+    description: "Spot USD price for symbols via CoinGecko keyless API (coins/markets, vs_currency=usd). Defaults to sol,eth (Solana-first). Node injects vs_currencies=eth which this endpoint ignores (reads vs_currency)."
     intents:
       - CRYPTO_PRICE
     params:
