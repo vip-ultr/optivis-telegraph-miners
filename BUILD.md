@@ -20,26 +20,27 @@ TVL_LOOKUP already has a live competitor: `tvlwire-oracle` (id 301). CRYPTO_PRIC
 and GAS_PRICE appear empty/unserved. So our strongest rank-#1 shot is CRYPTO_PRICE.
 TVL will compete but our multi-source + Solana-first angle differentiates.
 
-## Driving live traffic (Step 1 — IN PROGRESS, envelope blocked)
+## Driving live traffic (Step 1 DONE; Step 2 in progress)
 
-The Engine gates every query behind x402 ($0.01 testnet USDC). We built
-`tools/x402_payer.py` (Base Sepolia burner wallet, key from gitignored .env).
-It triggers the 402, decodes the `Payment-Required` challenge, signs a USDC
-`transfer(payTo, 10000)` tx, and re-POSTs.
+Step 1 proven: `tools/x402_payer.mjs` (official @x402/evm + @x402/fetch, viem
+signer, ExactEvmScheme, PAYMENT-SIGNATURE handshake) pays $0.01 and our miners
+answer live + get signal_hash (scored). Burner 0xe36a07...Ed4c funded 6000 USDC.
 
-OPEN ISSUE: the node returns a bare 402 on re-POST — our x402 v2 payment
-envelope is not being accepted. Tried: `X-PAYMENT` header, `Authorization:
-x402 <base64 json>` (json = {x402Version, scheme:"exact", network,
-payload:{transaction}}). Neither parsed. The Coinbase `x402` PyPI SDK (2.20.0)
-is server/facilitator-focused and ships no ready EVM "exact" signer client.
+KEY x402 learnings (from docs.telegraphprotocol.com/docs/using/x402-inference):
+- Signature is EIP-712 typed data (ERC-3009), NOT a raw transfer tx.
+- Header is `PAYMENT-SIGNATURE` (verified by PayAI facilitator).
+- Challenge decoded from `PAYMENT-REQUIRED` header (base64).
 
-NEED FROM TEAM: exact x402 v2 payment header name + envelope JSON shape their
-devnet node expects for the `exact` EVM scheme (does the signed tx need to be
-broadcast first? what header key? what payload fields beyond transaction?).
+Step 2: `tools/traffic_loop.mjs` fires N varied queries to build score history.
 
-Until that's resolved, organic hackathon traffic will still route to our
-registered+active miners and build score without us paying. Self-paid probes
-are blocked on the envelope format.
+OPEN FIX: crypto-price returns ETH-denominated result ({eth:{eth:1}}) because
+the node fills the `vs_currencies` param with its default (eth), overriding our
+baked ?vs_currencies=usd. FIX APPLIED in YAML (removed vs_currencies param so USD
+is forced via external_path) — but the ON-CHAIN miner still runs the OLD YAML,
+so crypto-price MUST BE RE-REGISTERED with the fixed file for USD to take effect.
+tvl (7312) is correct as-is.
+
+NOTE: CoinGecko keyless 429s under rapid load; loop spaces 2s between calls.
 
 
 The wizard sandbox POSTs /gas with no JSON-RPC body -> meowrpc returns 405. No

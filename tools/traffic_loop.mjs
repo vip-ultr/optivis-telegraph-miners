@@ -96,7 +96,7 @@ while (done < total) {
     if (done >= total) break;
     if (await ask(id, ep, pl, label)) okCount++;
     done++;
-    await new Promise((r) => setTimeout(r, 500)); // gentle rate limit
+    await new Promise((r) => setTimeout(r, 2000)); // space out to avoid CoinGecko 429
   }
 }
 console.log(`\nDONE: ${done} queries, ${okCount} OK`);
