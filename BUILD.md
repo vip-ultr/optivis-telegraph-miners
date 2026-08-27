@@ -20,29 +20,26 @@ TVL_LOOKUP already has a live competitor: `tvlwire-oracle` (id 301). CRYPTO_PRIC
 and GAS_PRICE appear empty/unserved. So our strongest rank-#1 shot is CRYPTO_PRICE.
 TVL will compete but our multi-source + Solana-first angle differentiates.
 
-## Driving live traffic (Step 1 — prove miners answer & build score)
+## Driving live traffic (Step 1 — IN PROGRESS, envelope blocked)
 
-The Engine gates every query behind x402 ($0.01 testnet USDC, Base Sepolia or
-Solana). To drive traffic we pay via Base Sepolia using `tools/x402_payer.py`.
+The Engine gates every query behind x402 ($0.01 testnet USDC). We built
+`tools/x402_payer.py` (Base Sepolia burner wallet, key from gitignored .env).
+It triggers the 402, decodes the `Payment-Required` challenge, signs a USDC
+`transfer(payTo, 10000)` tx, and re-POSTs.
 
-Setup (one-time):
-1. Create a Base Sepolia BURNER wallet. Fund it with: Base Sepolia ETH (gas)
-   + testnet USDC (the node's USDC on Base Sepolia is
-   `0x036CbD53842c5426634e7929541eC2318f3dCF7e`).
-2. Put the private key in `.env` (already gitignored):
-   `BASE_SEPOLIA_PRIVATE_KEY=0x...`
-3. Run:
-   . .venv/bin/activate
-   python3 tools/x402_payer.py            # default 4-query probe set
-   python3 tools/x402_payer.py 7311 "price of SOL in usd"   # single query
+OPEN ISSUE: the node returns a bare 402 on re-POST — our x402 v2 payment
+envelope is not being accepted. Tried: `X-PAYMENT` header, `Authorization:
+x402 <base64 json>` (json = {x402Version, scheme:"exact", network,
+payload:{transaction}}). Neither parsed. The Coinbase `x402` PyPI SDK (2.20.0)
+is server/facilitator-focused and ships no ready EVM "exact" signer client.
 
-The client reads the 402 challenge, signs a USDC transfer to the node's payTo,
-and re-POSTs with `Authorization: x402 eip155:84532 <base64tx>`. A 200 with the
-miner's answer proves end-to-end liveness and starts its scoring history.
+NEED FROM TEAM: exact x402 v2 payment header name + envelope JSON shape their
+devnet node expects for the `exact` EVM scheme (does the signed tx need to be
+broadcast first? what header key? what payload fields beyond transaction?).
 
-NOTE: x402 v2 exact-scheme envelope format assumed (network-prefixed base64
-signed tx). If the node rejects it, the 402 response will say why and we
-iterate the envelope. Key never printed or committed.
+Until that's resolved, organic hackathon traffic will still route to our
+registered+active miners and build score without us paying. Self-paid probes
+are blocked on the envelope format.
 
 
 The wizard sandbox POSTs /gas with no JSON-RPC body -> meowrpc returns 405. No

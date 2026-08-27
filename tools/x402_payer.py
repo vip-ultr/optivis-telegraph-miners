@@ -66,7 +66,13 @@ def decode_challenge(b64str: str) -> dict:
 
 
 def build_payment_header(challenge: dict, w3: Web3, acct: Account) -> str:
-    """Pick the Base Sepolia (eip155:84532) accept and sign a USDC transfer."""
+    """Pick the Base Sepolia (eip155:84532) accept and sign a USDC transfer.
+
+    x402 v2 'exact' EVM envelope:
+      header name: X-PAYMENT
+      header value: base64({ x402Version, scheme, network, payload:{ transaction } })
+    where transaction is the 0x-prefixed signed raw tx.
+    """
     accept = next(
         a for a in challenge["accepts"] if a["network"] == "eip155:84532"
     )
@@ -87,9 +93,13 @@ def build_payment_header(challenge: dict, w3: Web3, acct: Account) -> str:
     signed = acct.sign_transaction(tx)
     raw = signed.raw_transaction.hex() if hasattr(signed, "raw_transaction") \
         else signed.rawTransaction.hex()
-    # x402 v2 exact EVM envelope:  x402 <network> <base64(raw_tx)>
-    envelope = base64.b64encode(bytes.fromhex(raw[2:])).decode()
-    return f"x402 {accept['network']} {envelope}"
+    envelope = {
+        "x402Version": challenge.get("x402Version", 2),
+        "scheme": "exact",
+        "network": accept["network"],
+        "payload": {"transaction": raw},
+    }
+    return base64.b64encode(json.dumps(envelope).encode()).decode()
 
 
 def ask(miner_id: int, query: str, w3: Web3, acct: Account):
@@ -118,10 +128,14 @@ def ask(miner_id: int, query: str, w3: Web3, acct: Account):
         auth = build_payment_header(challenge, w3, acct)
     except Exception as e:
         return None, f"ERR signing: {e}"
+    accept_network = next(
+        a for a in challenge["accepts"] if a["network"] == "eip155:84532"
+    )["network"]
 
-    # 3) re-POST with payment
+    # 3) re-POST with payment (x402 v2: Authorization: x402 <base64 json>)
     hdr = dict(UA)
-    hdr["Authorization"] = auth
+    hdr["X-PAYMENT"] = auth
+    hdr["Authorization"] = f"x402 {auth}"
     req2 = urllib.request.Request(
         NODE + path, data=payload, headers=hdr, method="POST"
     )
@@ -139,8 +153,8 @@ def main():
     if not key or key == "0x":
         print("ERROR: set BASE_SEPOLIA_PRIVATE_KEY in .env (gitignored).")
         sys.exit(1)
-    rpc = os.getenv("BASE_SEPOLIA_RPC_URL", "https://sepolia.base.org")
-    w3 = Web3(Web3.HTTPProvider(rpc))
+    rpc = os.getenv("BASE_SEPOLIA_RPC_URL", "https://base-sepolia.public.blastapi.io")
+    w3 = Web3(Web3.HTTPProvider(rpc, request_kwargs={"timeout": 15}))
     acct = Account.from_key(key)
     print(f"Payer: {acct.address}  (Base Sepolia)")
     print(f"USDC balance check: {w3.eth.get_balance(acct.address)} wei\n")
