@@ -33,14 +33,18 @@ KEY x402 learnings (from docs.telegraphprotocol.com/docs/using/x402-inference):
 
 Step 2: `tools/traffic_loop.mjs` fires N varied queries to build score history.
 
-OPEN FIX: crypto-price returns ETH-denominated result ({eth:{eth:1}}) because
-the node fills the `vs_currencies` param with its default (eth), overriding our
-baked ?vs_currencies=usd. FIX APPLIED in YAML (removed vs_currencies param so USD
-is forced via external_path) — but the ON-CHAIN miner still runs the OLD YAML,
-so crypto-price MUST BE RE-REGISTERED with the fixed file for USD to take effect.
-tvl (7312) is correct as-is.
-
-NOTE: CoinGecko keyless 429s under rapid load; loop spaces 2s between calls.
+### Fixes applied + verified live (re-registered: crypto 240, tvl 241)
+- CRYPTO_PRICE USD bug: node injects vs_currencies=eth and overrides any baked
+  vs_currencies=usd on simple/price (which REQUIRES vs_currencies). FIX: /price
+  now uses coins/markets?vs_currency=usd (reads singular vs_currency, ignores
+  the injected plural) -> returns USD current_price. Verified: 2502.86 USD.
+- TVL protocol routing: /protocol had no param_map and DefiLlama is path-based,
+  so all protocols returned uniswap. FIX: explicit per-protocol endpoints
+  (/protocol/jupiter, /lido, /aave, /curve, /marinade, /jito, /kamino). Verified:
+  /protocol/jupiter returns Jupiter's solana:JUP... address + TVL.
+- NOTE: node auto-router for a plain "jupiter tvl" query picks /protocol
+  (uniswap default); correct per-protocol data requires specifying the endpoint.
+  Acceptable: agents that name the protocol hit the right endpoint.
 
 
 The wizard sandbox POSTs /gas with no JSON-RPC body -> meowrpc returns 405. No
