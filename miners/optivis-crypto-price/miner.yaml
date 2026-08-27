@@ -40,15 +40,8 @@ endpoints:
               - "*"
             description: "Comma-separated CoinGecko symbols, e.g. sol,eth,bonk."
             example: sol,eth
-          - name: vs_currencies
-            type: string
-            intents:
-              - "*"
-            description: "Comma-separated quote currencies. Defaults to usd."
-            default: usd
     param_map:
       symbols: symbols
-      vs_currencies: vs_currencies
   - path: /pair
     external_path: /latest/dex/tokens/So11111111111111111111111111111111111111112
     endpoint_base_url: https://api.dexscreener.com
