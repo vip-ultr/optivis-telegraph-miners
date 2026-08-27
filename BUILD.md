@@ -20,7 +20,31 @@ TVL_LOOKUP already has a live competitor: `tvlwire-oracle` (id 301). CRYPTO_PRIC
 and GAS_PRICE appear empty/unserved. So our strongest rank-#1 shot is CRYPTO_PRICE.
 TVL will compete but our multi-source + Solana-first angle differentiates.
 
-## Gas decision (deferred)
+## Driving live traffic (Step 1 — prove miners answer & build score)
+
+The Engine gates every query behind x402 ($0.01 testnet USDC, Base Sepolia or
+Solana). To drive traffic we pay via Base Sepolia using `tools/x402_payer.py`.
+
+Setup (one-time):
+1. Create a Base Sepolia BURNER wallet. Fund it with: Base Sepolia ETH (gas)
+   + testnet USDC (the node's USDC on Base Sepolia is
+   `0x036CbD53842c5426634e7929541eC2318f3dCF7e`).
+2. Put the private key in `.env` (already gitignored):
+   `BASE_SEPOLIA_PRIVATE_KEY=0x...`
+3. Run:
+   . .venv/bin/activate
+   python3 tools/x402_payer.py            # default 4-query probe set
+   python3 tools/x402_payer.py 7311 "price of SOL in usd"   # single query
+
+The client reads the 402 challenge, signs a USDC transfer to the node's payTo,
+and re-POSTs with `Authorization: x402 eip155:84532 <base64tx>`. A 200 with the
+miner's answer proves end-to-end liveness and starts its scoring history.
+
+NOTE: x402 v2 exact-scheme envelope format assumed (network-prefixed base64
+signed tx). If the node rejects it, the 402 response will say why and we
+iterate the envelope. Key never printed or committed.
+
+
 The wizard sandbox POSTs /gas with no JSON-RPC body -> meowrpc returns 405. No
 keyless GET gas API exists (publicnode GET returned HTML landing page, not RPC).
 No YAML `body:` field accepts a static literal (body only maps from on-chain
