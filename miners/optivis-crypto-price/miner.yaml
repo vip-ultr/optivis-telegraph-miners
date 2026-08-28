@@ -5,8 +5,8 @@ kind: miner
 id: 7311
 slug: optivis-crypto-price
 protocol: generic
-name: Optivis Crypto Price
-description: "Verifiable spot crypto pricing for autonomous agents. Wraps CoinGecko keyless simple-price API for symbol lookups and DexScreener for on-chain pair depth. Solana-first pair lookups. Multi-source answers: price plus liquidity, volume and FDV."
+name: Optivis Market Data
+description: "Verifiable crypto pricing, currency exchange and financial data for autonomous agents. Wraps CoinGecko keyless API (spot price, exchange rates, market cap/FDV) and DexScreener for on-chain pair depth. Solana-first. Multi-source answers: price plus liquidity, volume and FDV."
 base_url: https://api.coingecko.com
 
 docs:
@@ -59,6 +59,46 @@ endpoints:
               - "*"
             description: "Token contract address, e.g. So11111111111111111111111111111111111111112 for Wrapped SOL."
             example: So11111111111111111111111111111111111111112
+  - path: /fx
+    external_path: /api/v3/exchange_rates
+    method: GET
+    content_type: application/json
+    description: "Currency exchange rates vs USD via CoinGecko keyless exchange_rates. Returns every fiat/crypto rate as units-per-USD. Query base/target to scope."
+    intents:
+      - CURRENCY_EXCHANGE
+    params:
+      query:
+        optional:
+          - name: base
+            type: string
+            intents:
+              - "*"
+            description: "Base currency code, e.g. usd, eur, ngn."
+            example: usd
+          - name: target
+            type: string
+            intents:
+              - "*"
+            description: "Target currency code, e.g. eur, ngn, gbp."
+            example: eur
+  - path: /financials
+    external_path: /api/v3/coins/markets?vs_currency=usd&symbols=sol,eth
+    method: GET
+    content_type: application/json
+    description: "Market cap, FDV and 24h volume for symbols via CoinGecko coins/markets. USD-denominated (node-injected vs_currencies=eth ignored; reads vs_currency)."
+    intents:
+      - FINANCIAL_DATA
+    params:
+      query:
+        optional:
+          - name: symbols
+            type: string
+            intents:
+              - "*"
+            description: "Comma-separated CoinGecko symbols, e.g. sol,eth,bonk."
+            example: sol,eth
+    param_map:
+      symbols: symbols
 
 input_schema:
   type: object
@@ -106,6 +146,8 @@ semantics:
     label_field: price_usd
   supported_intents:
     - CRYPTO_PRICE
+    - CURRENCY_EXCHANGE
+    - FINANCIAL_DATA
 
 on_chain:
   description: "Stores the primary numeric answer (price, TVL, or gas in gwei) plus a source tag and, for pairs, liquidity/volume/FDV so downstream agents and contracts can consume verified market signal directly on-chain."

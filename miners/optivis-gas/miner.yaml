@@ -1,12 +1,11 @@
-
 version: "1"
 kind: miner
 id: 7313
 slug: optivis-gas
 protocol: generic
-name: Optivis Gas Oracle
-description: "Verifiable network gas price for autonomous transaction-optimisation agents. Wraps a keyless Ethereum JSON-RPC (eth_gasPrice) and reports the current gas price in gwei. No API key, no account - the node calls a public RPC directly."
-base_url: https://eth.meowrpc.com
+name: Optivis Gas Price
+description: "Verifiable EVM gas price (gwei) for transaction optimisation bots. Wraps keyless publicnode.com JSON-RPC eth_gasPrice for Base, Ethereum and other EVM chains. Solana-first framing: Base default. Returns current gas price in wei (hex) plus gwei."
+base_url: https://base-rpc.publicnode.com
 
 docs:
   website: https://github.com/vip-ultr/optivis-telegraph-miners
@@ -17,73 +16,61 @@ docs:
 auth:
   type: none
 
-rate_limit_per_sec: 10
+rate_limit_per_sec: 5
 cache_ttl_sec: 15
 circuit_threshold: 5
 circuit_cooldown_seconds: 30
 
 endpoints:
   - path: /gas
-    external_path: /
+    external_path: ""
     method: POST
     content_type: application/json
-    description: "Current Ethereum gas price in gwei via eth_gasPrice (JSON-RPC)."
+    description: "Current Base gas price via JSON-RPC eth_gasPrice against keyless publicnode.com Base RPC. Returns gas price in wei (hex) plus gwei."
     intents:
       - GAS_PRICE
-    params:
-      query:
-        optional:
-          - name: chain
-            type: string
-            intents:
-              - "*"
-            description: "Chain name (reserved for future multi-chain support)."
-            default: ethereum
+    body:
+      jsonrpc: "2.0"
+      method: eth_gasPrice
+      params: []
+      id: 1
 
 input_schema:
   type: object
-  properties:
-    chain:
-      type: string
-      description: "Chain name (reserved for future multi-chain support)."
+  properties: {}
 
 output_schema:
   type: object
   properties:
-    gas_gwei:
-      type: number
-      description: "Current gas price in gwei."
-    source:
+    gas_price_wei:
       type: string
-      description: "Which upstream produced the answer."
+      description: "Hex-encoded gas price in wei from eth_gasPrice result."
+    gas_price_gwei:
+      type: number
+      description: "Gas price converted to gwei."
+    chain:
+      type: string
+      description: "Which chain was queried."
 
 semantics:
   signal_mapping:
-    label_field: gas_gwei
+    label_field: gas_price_gwei
   supported_intents:
     - GAS_PRICE
 
 on_chain:
-  description: "Stores the current gas price in gwei plus a source tag so downstream agents and contracts can consume verified network congestion signal directly on-chain."
+  description: "Stores the current gas price in gwei plus the chain tag so downstream agents and contracts can consume verified gas signal on-chain."
   transform: direct
   min_price_usdc: 0.01
   fields:
     strings:
       - index: 0
-        name: source
-        source_path: source
-        description: "Upstream RPC that produced the gas price."
+        name: chain
+        source_path: chain
+        description: "Chain queried (base)."
     integers:
       - index: 0
-        name: gas_gwei_x100
-        source_path: gas_gwei
-        multiplier: 100
-        description: "Current gas price in gwei scaled by 100."
-
-  request:
-    - endpoint: gas
-      method: POST
-      query_params:
-        ref:
-          source: strings.0
-          optional: true
+        name: gas_price_gwei_x1000
+        source_path: gas_price_gwei
+        multiplier: 1000
+        description: "Gas price in gwei scaled by 1000."

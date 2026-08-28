@@ -29,7 +29,7 @@ MINERS = os.path.join(ROOT, "miners")
 
 ALLOWED_ENDPOINT_KEYS = {
     "path", "external_path", "method", "description", "endpoint_base_url",
-    "content_type", "multipart_fields", "param_map", "intents", "params",
+    "content_type", "multipart_fields", "param_map", "intents", "params", "body",
 }
 ALLOWED_SIGNAL_KEYS = {"confidence_field", "label_field", "reason_field"}
 ALLOWED_KINDS = {"miner", "validator", "subnet"}
