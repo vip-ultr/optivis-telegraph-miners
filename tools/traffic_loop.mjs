@@ -39,9 +39,9 @@ const QUERIES = [
   [7312, "/protocol/jito", {}, "jito tvl"],
   [7312, "/chain", { chain: "Solana" }, "solana chain tvl"],
   [7312, "/yields", { chain: "Solana" }, "solana yields"],
-  [289, "/fx", { base: "usd", target: "eur" }, "usd to eur fx"],
-  [289, "/fx", { base: "usd", target: "ngn" }, "usd to ngn fx"],
-  [289, "/financials", { symbols: "sol,eth", vs_currencies: "usd" }, "sol,eth financials"],
+  [7311, "/fx", { base: "usd", target: "eur" }, "usd to eur fx"],
+  [7311, "/fx", { base: "usd", target: "ngn" }, "usd to ngn fx"],
+  [7311, "/financials", { symbols: "sol,eth", vs_currencies: "usd" }, "sol,eth financials"],
   [7313, "/gas", {}, "base gas price"],
 ];
 

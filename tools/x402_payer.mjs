@@ -57,12 +57,18 @@ const fetchWithPayment = wrapFetchWithPaymentFromConfig(globalThis.fetch, config
 
 async function ask(minerId, query) {
   // Direct-routed: force our miner. Body shape per docs:
-  // { method, endpoint, payload }. For CRYPTO_PRICE use /price; TVL use /protocol.
-  const endpoint = minerId === 7311 ? "/price" : "/protocol";
-  const payload =
-    minerId === 7311
-      ? { symbols: "sol,eth", vs_currencies: "usd" }
-      : { protocol: "uniswap" };
+  // { method, endpoint, payload }. Map each miner to its correct default endpoint.
+  let endpoint, payload;
+  if (minerId === 7311) {
+    endpoint = "/price";
+    payload = { symbols: "sol,eth", vs_currencies: "usd" };
+  } else if (minerId === 7313) {
+    endpoint = "/gas";
+    payload = {};
+  } else {
+    endpoint = "/protocol";
+    payload = { protocol: "uniswap" };
+  }
   const url = `${NODE}/engine/v1/ask/${minerId}`;
   let res, text;
   for (let attempt = 1; attempt <= 4; attempt++) {
