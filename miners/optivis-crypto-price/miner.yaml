@@ -78,7 +78,7 @@ output_schema:
   properties:
     price_usd:
       type: number
-      description: "Spot USD price from /price, first requested symbol."
+      description: "Spot USD price from /price (mapped from upstream current_price)."
     source:
       type: string
       description: "Which upstream produced the answer."
@@ -124,9 +124,9 @@ on_chain:
     integers:
       - index: 0
         name: price_usd_x100000
-        source_path: price_usd
+        source_path: current_price
         multiplier: 100000
-        description: "Spot USD price scaled by 100000."
+        description: "Spot USD price scaled by 100000 (upstream field current_price; response is an array of per-symbol objects)."
       - index: 1
         name: liquidity_usd_x100
         source_path: pair.liquidity_usd
