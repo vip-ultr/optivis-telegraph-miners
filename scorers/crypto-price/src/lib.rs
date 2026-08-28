@@ -149,22 +149,29 @@ fn score(ground: &str, answer: &str) -> f32 {
     if answer == ground {
         return 1.0;
     }
-    // Primary: numeric comparison (handles prices, TVL figures, APY).
     let mut gn = [0f64; MAX_NUMS];
     let mut an = [0f64; MAX_NUMS];
     let gn_n = extract_numbers(ground, &mut gn);
     let an_n = extract_numbers(answer, &mut an);
-    let num_sim = number_similarity(&gn, gn_n, &an, an_n);
-    if num_sim >= 0.0 {
-        // blend numeric similarity with a small word-overlap bonus so that
-        // textually-wrong-but-numerically-right still scores high, and
-        // purely textual answers still get a floor.
-        let words = word_overlap(answer, ground);
-        let blended = num_sim * 0.85 + words * 0.15;
-        return blended.min(1.0);
+
+    if gn_n > 0 && an_n > 0 {
+        // Both sides have numbers: score purely on numeric match.
+        let num_sim = number_similarity(&gn, gn_n, &an, an_n);
+        // num_sim in [0,1]: 1.0 = exact match, ->0 = far off.
+        // No word-overlap floor: a wrong number must score low.
+        return num_sim.max(0.0).min(1.0);
     }
-    // No numbers on one side: fall back to pure word overlap.
-    word_overlap(answer, ground)
+
+    if gn_n == 0 && an_n == 0 {
+        // Neither has numbers: pure textual similarity.
+        return word_overlap(answer, ground).min(1.0);
+    }
+
+    // One side has numbers, the other doesn't: they disagree on format.
+    // A numeric ground truth answered with no number (or vice versa) is a
+    // poor answer -> score it low but not zero (allow partial text credit).
+    let words = word_overlap(answer, ground);
+    (words * 0.3).min(1.0)
 }
 
 #[unsafe(no_mangle)]
