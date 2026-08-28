@@ -20,7 +20,37 @@ TVL_LOOKUP already has a live competitor: `tvlwire-oracle` (id 301). CRYPTO_PRIC
 and GAS_PRICE appear empty/unserved. So our strongest rank-#1 shot is CRYPTO_PRICE.
 TVL will compete but our multi-source + Solana-first angle differentiates.
 
-## Driving live traffic (Step 1 DONE; Step 2 in progress)
+## Format-mismatch hypothesis (to confirm at epoch 289)
+- Top miners return CLEAN objects with explicit numeric fields:
+  chainsight-oracle label_field='signal', fields price_usd/market_cap_usd/rate/
+  tvl_usd/gas_price_gwei/volume_24h_usd. txlens has price_usd, tvl_usd, rate,
+  gas_price_gwei, market_cap_usd.
+- OUR miners return RAW upstream JSON: CoinGecko /price is ARRAY
+  [{current_price, symbol}], /financials array, /fx exchange_rates dict.
+  No price_usd/rate/tvl_usd named fields the scorer's label_field extracts.
+- IF epoch 289 shows top miners ~0.5-0.9 but us still 0 -> scorer field-extraction
+  fails on our raw shape. FIX needs a reshaping proxy (free Cloudflare Worker /
+  Vercel) returning {price_usd, rate, tvl_usd, market_cap_usd, gas_price_gwei}.
+  Miners are serverless YAML proxies (no custom code), so a transform layer
+  requires our own free-hosted API in front of CoinGecko/DefiLlama.
+- If epoch 289 also ~0 network-wide -> systemic, no format fix needed yet.
+
+## Gas miner known issue
+- 7313 /gas returns HTTP 500 "Parse error" on live queries. Engine sends
+  payload:{} as POST body; our static body: (JSON-RPC eth_gasPrice) NOT applied
+  for engine/ask (only on_chain.request uses body:). publicnode itself works
+  (0x5b8d80 ~5.78 gwei). No keyless GET gas API exists. Gas serving blocked
+  until engine constructs proper JSON-RPC payload for GAS_PRICE, or we host a
+  free GET gas wrapper. Deferred.
+
+## Driving live traffic
+- tools/x402_payer.mjs (official @x402/evm + @x402/fetch, ExactEvmScheme,
+  PAYMENT-SIGNATURE) pays $0.01; miners answer + signal_hash (scored).
+  Burner 0xe36a07...Ed4c funded 6000 USDC.
+- tools/traffic_loop.mjs fires 20 varied queries, 2s spacing (CoinGecko 429).
+- NOTE: engine routes by YAML id (7311/7312/7313), NOT registration_id. Loop/
+  payer must use YAML id, not re-registration id (289).
+
 
 Step 1 proven: `tools/x402_payer.mjs` (official @x402/evm + @x402/fetch, viem
 signer, ExactEvmScheme, PAYMENT-SIGNATURE handshake) pays $0.01 and our miners
