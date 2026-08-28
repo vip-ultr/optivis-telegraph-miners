@@ -23,7 +23,7 @@ circuit_cooldown_seconds: 30
 
 endpoints:
   - path: /gas
-    external_path: ""
+    external_path: /
     method: POST
     content_type: application/json
     description: "Current Base gas price via JSON-RPC eth_gasPrice against keyless publicnode.com Base RPC. Returns gas price in wei (hex) plus gwei."
