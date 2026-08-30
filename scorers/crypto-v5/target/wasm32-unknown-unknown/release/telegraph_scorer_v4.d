@@ -1,0 +1,1 @@
+/home/ammar/hackathon/optivis-telegraph-miners/scorers/crypto-v4/target/wasm32-unknown-unknown/release/telegraph_scorer_v4.wasm: /home/ammar/hackathon/optivis-telegraph-miners/scorers/crypto-v4/src/lib.rs
