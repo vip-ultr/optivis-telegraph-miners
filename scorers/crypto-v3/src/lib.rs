@@ -56,6 +56,18 @@ const TOKENS: &[&str] = &[
 ];
 
 // Hedge / uncertainty markers: bad answers often hedge.
+const HEDGE_PENALTY: f32 = 0.30;
+const QUALIFIER_PENALTY: f32 = 0.15;
+const WRONG_ASSET_PENALTY: f32 = 0.30;
+const NO_ASSET_PENALTY: f32 = 0.10;
+const CONCISE_BONUS: f32 = 0.05;
+const LONG_PENALTY: f32 = 0.10;
+const NUMBER_BONUS: f32 = 0.25;
+const TOKEN_BONUS: f32 = 0.20;
+const VAGUE_TOKEN_BONUS: f32 = 0.05;
+const BASE_SCORE: f32 = 0.52;
+
+// Hedge / uncertainty markers: bad answers often hedge.
 const HEDGES: &[&str] = &[
     "maybe", "perhaps", "possibly", "i think", "i'm not sure", "not sure",
     "could be", "might be", "approximately", "around", "roughly", "estimate",
@@ -169,33 +181,33 @@ fn answer_quality(question: &str, answer: &str) -> f32 {
     }
     let q_tok = detect_token(question);
     let a_tok = detect_token(answer);
-    let mut score = 0.50f32; // base
+    let mut score = BASE_SCORE;
 
     // A real answer carries a numeric value.
     if has_number(answer) {
-        score += 0.25;
+        score += NUMBER_BONUS;
     }
 
     // Entity alignment: answer addresses the asset in the question.
     if let Some(qt) = q_tok {
         if a_tok == Some(qt) {
-            score += 0.20; // correct asset
+            score += TOKEN_BONUS; // correct asset
         } else if a_tok.is_none() {
-            score -= 0.10; // answer doesn't name any asset
+            score -= NO_ASSET_PENALTY; // answer doesn't name any asset
         } else {
-            score -= 0.30; // answer names a DIFFERENT asset than asked -> strong penalty
+            score -= WRONG_ASSET_PENALTY; // answer names a DIFFERENT asset -> strong penalty
         }
     } else if a_tok.is_some() {
-        score += 0.05; // generic asset mention when question is vague
+        score += VAGUE_TOKEN_BONUS; // generic asset mention when question is vague
     }
 
     // Directness: hedging is a hallmark of weak/wrong answers.
     if contains_any(answer, HEDGES) {
-        score -= 0.30;
+        score -= HEDGE_PENALTY;
     }
     // Contradiction/qualifier markers reduce confidence.
     if contains_any(answer, QUALIFIERS) {
-        score -= 0.15;
+        score -= QUALIFIER_PENALTY;
     }
 
     // Reward concise, single-fact answers; penalize very long rambling.
